@@ -1,0 +1,15 @@
+D:\mypro\test\bin\Debug\test.exe.config
+D:\mypro\test\bin\Debug\test.exe
+D:\mypro\test\bin\Debug\test.pdb
+D:\mypro\test\obj\Debug\test.csproj.AssemblyReference.cache
+D:\mypro\test\obj\Debug\test.csproj.CoreCompileInputs.cache
+D:\mypro\test\obj\Debug\test.exe
+D:\mypro\test\obj\Debug\test.pdb
+D:\mypro\test\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+D:\mypro\test\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
+D:\mypro\test\obj\Debug\test.csproj.CopyComplete
+D:\mypro\test\bin\Debug\OfficeOpenXml.Core.ExcelPackage.dll
+D:\mypro\test\bin\Debug\System.IO.Packaging.dll
+D:\mypro\test\bin\Debug\OfficeOpenXml.Core.ExcelPackage.pdb
+D:\mypro\test\bin\Debug\EPPlus.Core.dll
+D:\mypro\test\bin\Debug\EPPlus.Core.xml
