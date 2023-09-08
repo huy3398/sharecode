@@ -21,8 +21,8 @@ namespace test
         static void Main(string[] args)
         {
            
-            string excelFilePath = "D:\\mypro\\data.xlsx"; // Đường dẫn tới tệp Excel
-            string outputFilePath = "D:\\mypro\\data.txt"; // Đường dẫn tới tệp văn bản đầu ra
+            string excelFilePath = "C:\\Users\\Administrator\\Desktop\\run.xlsx"; // Đường dẫn tới tệp Excel
+            string outputFilePath = "C:\\Users\\Administrator\\Desktop\\data.txt"; // Đường dẫn tới tệp văn bản đầu ra
 
             string sheetName = "Summary"; // Tên của sheet chứa dữ liệu
 
@@ -32,8 +32,10 @@ namespace test
                 "G4:G22",
                 "M4:M22",
                 "S4:S22",
-                "Y4:Y22",
+                "Y4:Y22","" +
+                "AL4:AL24",
                 "AF4:AH24"
+                
                 // Thêm các vùng ô khác vào đây nếu cần
             };
             
@@ -45,6 +47,10 @@ namespace test
                 {
                     using (StreamWriter writer = new StreamWriter(outputFilePath))
                     {
+                        writer.WriteLine(" Dear Sir / All");
+                        writer.WriteLine(" I share result LT AMI MP");
+                        writer.WriteLine(" Time : 2023/9/7  18:00  -  2023/9/7  20:00");
+                        writer.WriteLine("\n");
                         foreach (var range in cellRanges)
                         {
                             var cellValues = worksheet.Cells[range].Value as object[,];
@@ -54,8 +60,10 @@ namespace test
                                 {
                                     var cellValue = cellValues[row - 1, 0];
                                     writer.WriteLine(cellValue);
+                                    
                                 }
                             }
+                            writer.WriteLine("***************************************************");
                         }
                     }
 
