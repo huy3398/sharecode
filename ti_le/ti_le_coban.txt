@@ -1,0 +1,62 @@
+using System;
+using System.Data;
+using MySql.Data.MySqlClient;
+using System.IO;
+using System.Globalization;
+
+class Program
+{
+    static void Main()
+    {
+        string connectionString = "Server=192.168.0.1;Database=YourDatabase;User=ami;Password=protnc;";
+        string query = "SELECT idproduct, judge FROM product";
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                {
+                    DataTable dataTable = new DataTable();
+                    adapter.Fill(dataTable);
+
+                    int totalProducts = dataTable.Rows.Count;
+                    int okCount = 0;
+                    int ngCount = 0;
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        string judge = row["judge"].ToString();
+                        if (judge == "OK")
+                        {
+                            okCount++;
+                        }
+                        else if (judge == "NG")
+                        {
+                            ngCount++;
+                        }
+                    }
+
+                    double okPercentage = (double)okCount / totalProducts * 100;
+                    double ngPercentage = (double)ngCount / totalProducts * 100;
+
+                    // Đường dẫn tới tệp CSV
+                    string csvFilePath = "result.csv";
+
+                    // Ghi dữ liệu vào tệp CSV
+                    using (StreamWriter writer = new StreamWriter(csvFilePath))
+                    {
+                        writer.WriteLine("Tổng số lượng idproduct, Tỉ lệ OK (%), Tỉ lệ NG (%)");
+                        writer.WriteLine($"{totalProducts}, {okPercentage.ToString("0.00", CultureInfo.InvariantCulture)}, {ngPercentage.ToString("0.00", CultureInfo.InvariantCulture)}");
+                    }
+
+                    Console.WriteLine("Dữ liệu đã được xuất ra tệp result.csv.");
+                }
+            }
+
+            connection.Close();
+        }
+    }
+}

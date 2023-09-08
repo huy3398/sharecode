@@ -1,0 +1,87 @@
+using System;
+using System.Data;
+using MySql.Data.MySqlClient;
+using System.IO;
+using System.Globalization;
+
+class Program
+{
+    static void Main()
+    {
+        string connectionString = "Server=192.168.0.1;Database=YourDatabase;User=ami;Password=protnc;";
+        string query = "SELECT panelid, judge, priority_defect_name FROM product WHERE start_datetime BETWEEN @StartDateTime AND @EndDateTime";
+
+        Console.Write("Nhập ngày/giờ bắt đầu (yyyy-MM-dd HH:mm:ss): ");
+        string inputStartDateTime = Console.ReadLine();
+
+        Console.Write("Nhập ngày/giờ kết thúc (yyyy-MM-dd HH:mm:ss): ");
+        string inputEndDateTime = Console.ReadLine();
+
+        if (DateTime.TryParse(inputStartDateTime, out DateTime startDateTime) && DateTime.TryParse(inputEndDateTime, out DateTime endDateTime))
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StartDateTime", startDateTime);
+                    command.Parameters.AddWithValue("@EndDateTime", endDateTime);
+
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                    {
+                        DataTable dataTable = new DataTable();
+                        adapter.Fill(dataTable);
+
+                        int totalPanels = dataTable.Rows.Count;
+                        int okCount = 0;
+                        int ngCount = 0;
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            string judge = row["judge"].ToString();
+                            if (judge == "OK")
+                            {
+                                okCount++;
+                            }
+                            else if (judge == "NG")
+                            {
+                                ngCount++;
+                            }
+                        }
+
+                        double okPercentage = (double)okCount / totalPanels * 100;
+                        double ngPercentage = (double)ngCount / totalPanels * 100;
+
+                        // Tên priority_defect_name và số lượng dựa trên display_insp
+                        string priorityDefectName = "Tên Priority Defect";
+                        int displayInspCount = 10; // Thay bằng số lượng thực tế từ display_insp
+
+                        // Tính tỷ lệ phần trăm dựa trên số lượng panelid
+                        double priorityPercentage = (double)displayInspCount / totalPanels * 100;
+
+                        // Đường dẫn tới tệp văn bản (.txt)
+                        string txtFilePath = "result.txt";
+
+                        // Ghi dữ liệu vào tệp văn bản
+                        using (StreamWriter writer = new StreamWriter(txtFilePath))
+                        {
+                            writer.WriteLine($"Tổng số lượng panelid: {totalPanels}");
+                            writer.WriteLine($"Tỉ lệ OK (%): {okPercentage.ToString("0.00", CultureInfo.InvariantCulture)}");
+                            writer.WriteLine($"Tỉ lệ NG (%): {ngPercentage.ToString("0.00", CultureInfo.InvariantCulture)}");
+                            writer.WriteLine($"{priorityDefectName}: {displayInspCount} (Tỉ lệ: {priorityPercentage.ToString("0.00", CultureInfo.InvariantCulture)}%)");
+                        }
+
+                        Console.WriteLine("Dữ liệu đã được xuất ra tệp result.txt.");
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+        else
+        {
+            Console.WriteLine("Ngày/giờ không hợp lệ.");
+        }
+    }
+}

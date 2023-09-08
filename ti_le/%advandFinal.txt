@@ -1,0 +1,131 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using MySql.Data.MySqlClient;
+using System.IO;
+using System.Globalization;
+
+class Program
+{
+    static void Main()
+    {
+        // Địa chỉ IP và thông tin kết nối tương ứng cho từng máy chủ
+        Dictionary<int, string> serverConnections = new Dictionary<int, string>
+        {
+            { 401, "Server=192.168.0.1;Database=YourDatabase1;User=ami;Password=protnc;" },
+            { 503, "Server=192.169.0.3;Database=YourDatabase2;User=ami;Password=protnc;" },
+            { 504, "Server=192.168.100.1;Database=YourDatabase3;User=ami;Password=protnc;" },
+            // Thêm các máy chủ khác tương tự ở đây
+        };
+
+        Console.Write("Nhập ngày/giờ bắt đầu (yyyy-MM-dd HH:mm:ss): ");
+        string inputStartDateTime = Console.ReadLine();
+
+        Console.Write("Nhập ngày/giờ kết thúc (yyyy-MM-dd HH:mm:ss): ");
+        string inputEndDateTime = Console.ReadLine();
+
+        if (DateTime.TryParse(inputStartDateTime, out DateTime startDateTime) && DateTime.TryParse(inputEndDateTime, out DateTime endDateTime))
+        {
+            // Tạo tệp văn bản tổng hợp
+            string summaryFilePath = "data.txt";
+
+            // Mở tệp văn bản tổng hợp để ghi dữ liệu
+            using (StreamWriter summaryWriter = new StreamWriter(summaryFilePath))
+            {
+                foreach (var serverConnection in serverConnections)
+                {
+                    int serverCode = serverConnection.Key;
+                    string connectionString = serverConnection.Value;
+
+                    string query = "SELECT panelid, judge, display_insp, priority_defect_name FROM product WHERE start_datetime BETWEEN @StartDateTime AND @EndDateTime";
+
+                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+
+                        using (MySqlCommand command = new MySqlCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@StartDateTime", startDateTime);
+                            command.Parameters.AddWithValue("@EndDateTime", endDateTime);
+
+                            using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                            {
+                                DataTable dataTable = new DataTable();
+                                adapter.Fill(dataTable);
+
+                                int totalPanels = dataTable.Rows.Count;
+                                int okCount = 0;
+                                int ngCount = 0;
+
+                                Dictionary<string, int> priorityDefectCounts = new Dictionary<string, int>();
+                                Dictionary<string, int> displayInspCounts = new Dictionary<string, int>();
+
+                                foreach (DataRow row in dataTable.Rows)
+                                {
+                                    string judge = row["judge"].ToString();
+                                    string priorityDefectName = row["priority_defect_name"].ToString();
+
+                                    if (judge == "OK")
+                                    {
+                                        okCount++;
+                                    }
+                                    else if (judge == "NG")
+                                    {
+                                        ngCount++;
+                                        string[] displayInsps = row["display_insp"].ToString().Split(',');
+                                        foreach (string displayInsp in displayInsps)
+                                        {
+                                            if (!displayInspCounts.ContainsKey(displayInsp))
+                                            {
+                                                displayInspCounts[displayInsp] = 0;
+                                            }
+                                            displayInspCounts[displayInsp]++;
+                                        }
+
+                                        if (!string.IsNullOrEmpty(priorityDefectName))
+                                        {
+                                            if (!priorityDefectCounts.ContainsKey(priorityDefectName))
+                                            {
+                                                priorityDefectCounts[priorityDefectName] = 0;
+                                            }
+                                            priorityDefectCounts[priorityDefectName]++;
+                                        }
+                                    }
+                                }
+
+                                double okPercentage = (double)okCount / totalPanels * 100;
+                                double ngPercentage = (double)ngCount / totalPanels * 100;
+
+                                // Ghi dữ liệu vào tệp văn bản tổng hợp
+                                summaryWriter.WriteLine($"Báo cáo \"{serverCode}\" (thay {serverCode} = {serverConnection.Key}):");
+                                summaryWriter.WriteLine($"Tổng số lượng panelid: {totalPanels}");
+                                summaryWriter.WriteLine($"Tỉ lệ OK (%): {okPercentage.ToString("0.00", CultureInfo.InvariantCulture)}");
+                                summaryWriter.WriteLine($"Tỉ lệ NG (%): {ngPercentage.ToString("0.00", CultureInfo.InvariantCulture)}");
+
+                                foreach (var kvp in priorityDefectCounts)
+                                {
+                                    double priorityPercentage = (double)kvp.Value / totalPanels * 100;
+                                    summaryWriter.WriteLine($"{kvp.Key}: {kvp.Value} (Tỉ lệ: {priorityPercentage.ToString("0.00", CultureInfo.InvariantCulture)}%)");
+                                }
+
+                                foreach (var kvp in displayInspCounts)
+                                {
+                                    double displayPercentage = (double)kvp.Value / totalPanels * 100;
+                                    summaryWriter.WriteLine($"Display Insp {kvp.Key}: {kvp.Value} (Tỉ lệ: {displayPercentage.ToString("0.00", CultureInfo.InvariantCulture)}%)");
+                                }
+                            }
+                        }
+
+                        connection.Close();
+                    }
+                }
+            }
+
+            Console.WriteLine($"Dữ liệu đã được xuất ra tệp {summaryFilePath}.");
+        }
+        else
+        {
+            Console.WriteLine("Ngày/giờ không hợp lệ.");
+        }
+    }
+}

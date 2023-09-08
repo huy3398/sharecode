@@ -1,0 +1,86 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
+
+namespace DatabaseConnectionExample
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+           // string[] serverAddresses = { "192.168.1.20", "192.168.1.21" };
+            string[] serverAddresses = { " 192.168.0.103" };
+            string connectionStringTemplate = "Data Source={0};Initial Catalog=ami_lt;User ID=ami;Password=protnc";
+            string outputFileName = "output.txt";
+
+            Console.Write("Nhập thời gian bắt đầu (yyyy-MM-dd HH:mm:ss): ");
+            string startTimeInput = Console.ReadLine();
+            DateTime startTime;
+
+            if (!DateTime.TryParse(startTimeInput, out startTime))
+            {
+                Console.WriteLine("Thời gian không hợp lệ.");
+                return;
+            }
+
+            Console.Write("Nhập thời gian kết thúc (yyyy-MM-dd HH:mm:ss): ");
+            string endTimeInput = Console.ReadLine();
+            DateTime endTime;
+
+            if (!DateTime.TryParse(endTimeInput, out endTime))
+            {
+                Console.WriteLine("Thời gian không hợp lệ.");
+                return;
+            }
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(outputFileName))
+                {
+                    foreach (string serverAddress in serverAddresses)
+                    {
+                        string connectionString = string.Format(connectionStringTemplate, serverAddress);
+
+                        // Ghi tiền tố vào tệp output.txt
+                        writer.WriteLine($"*{serverAddress}: ");
+
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+
+                            string query = "SELECT judge, priority_defect_name, panelid, display_ins, start_time FROM product WHERE start_time BETWEEN @StartTime AND @EndTime";
+                            SqlCommand command = new SqlCommand(query, connection);
+                            command.Parameters.AddWithValue("@StartTime", startTime);
+                            command.Parameters.AddWithValue("@EndTime", endTime);
+
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    string judge = reader["judge"].ToString();
+                                    string priorityDefectName = reader["priority_defect_name"].ToString();
+                                    string panelId = reader["panelid"].ToString();
+                                    string displayIns = reader["display_ins"].ToString();
+                                    DateTime start_time = Convert.ToDateTime(reader["start_time"]);
+
+                                    // Ghi dữ liệu vào tệp output.txt
+                                    writer.WriteLine($"{judge}, {priorityDefectName}, {panelId}, {displayIns}, {start_time}");
+                                }
+                            }
+                        }
+
+                        // Để phân tách dữ liệu giữa các máy chủ
+                        writer.WriteLine();
+                    }
+                }
+
+                Console.WriteLine("Dữ liệu đã được xuất ra tệp output.txt.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi: {ex.Message}");
+            }
+        }
+    }
+}
