@@ -1,0 +1,21 @@
+#401 Report
+Total Input: 3990ea
+
+CH_3: OK: 99.60% - 498ea / NG: 0.40% - 2ea
+CH_6: OK: 99.80% - 496ea / NG: 0.20% - 1ea
+CH_7: OK: 99.80% - 491ea / NG: 0.20% - 1ea
+CH_-1: OK: NaN% - 0ea / NG: NaN% - 0ea
+CH_1: OK: 100.00% - 513ea / NG: 0.00% - 0ea
+CH_8: OK: 99.39% - 485ea / NG: 0.61% - 3ea
+CH_2: OK: 100.00% - 506ea / NG: 0.00% - 0ea
+CH_4: OK: 100.00% - 489ea / NG: 0.00% - 0ea
+CH_5: OK: 100.00% - 503ea / NG: 0.00% - 0ea
+
+OK Total: 99.77% -3981ea
+ -IQ_Fail: 0.00 -0ea
+NG Total: 0.18 -7ea
+ -Dark_PD_Connected_DOE: 0.05% -2ea
+ -Dark_PD_3connected: 0.10% -4ea
+ -Crack: 0.03% -1ea
+
+
