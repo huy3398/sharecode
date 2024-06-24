@@ -1,0 +1,5 @@
+code c# chương trình coppy folder từ máy A có địa chỉ thư mục \\10.110.11.8\d\vp1  sang máy local B vào thư mục D:/data/vp . với tên file lấy từ tệp data.txt trong D:/data.txt có dạng:  
+sdkfhhfskdh
+fsdbfsdbfbs
+fsdbfsdbfbs
+fsdjfsnfnnfs
