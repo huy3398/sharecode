@@ -2,3 +2,4 @@ máy A có địa chỉ thư mục cần coppy \\10.121.41.200\f\verify  (tênfi
  máy local B vào thư mục E:\mydata .
 file danh sách tên file cần coppy: E:\data.txt mỗi tên file cách nhau \n (tênfile1,tênfile2)
 code c# tìm các file trong  \\10.121.41.200\f\verify   có tên trùng với tên file trong danh sách data.txt rồi coppy tất cả các file đó vào E:\mydata .
+\\10.119.160.128\D\공유\Algorithm Unit\LT_AMI\vp1 test
