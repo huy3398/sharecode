@@ -4,3 +4,8 @@ file danh sách tên file cần coppy: E:\data.txt mỗi tên file cách nhau \n
 code c# tìm các file trong  \\10.121.41.200\f\verify   có tên trùng với tên file trong danh sách data.txt rồi coppy tất cả các file đó vào E:\mydata .
 \\10.119.160.128\D\공유\Algorithm Unit\LT_AMI\vp1 test
 ệnh set "targetDirectory=\\10.119.160.128\d\공유\Algorithm Unit\LT_AMI\vp1_1"  không tìm thấy đường dẫn do chứa 공유 trong đường dẫn
+
+máy A và B kết nối bằng mạng lan
+code c# sử dung win form  coppy thư mục từ máy A sang máy B với:
+địa chỉ máy A và B nhập từ textbox.
+danh sách thư mục cần coppy nhập từ textbox với mỗi tên thư mục một dòng
